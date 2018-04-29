@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "",
+  password: "hinky6699a",
   database: "bamazonDB"
 });
 
@@ -23,18 +23,13 @@ connection.connect(function (error) {
     connection.query('SELECT * FROM products', function (error, res) {
         if (error) throw error;
         console.log(res);
-       //start()
+   
        buyItem()
+       
         //connection.end();
     });
 
 });
-
-function start(){
-
-
-}
-
 function buyItem() {
     // query the database for all items being auctioned
     connection.query("SELECT product_name FROM products", function(err, results) {
@@ -59,49 +54,42 @@ function buyItem() {
             type: "input",
             message: "How many would you like to buy?"
           }
-        ])
-    
-        .then(function(answer) {
+        ]).then(function(answer) {
           // get the information of the chosen item
-          console.log(answer.choice)
-         console.log( parseInt(answer.order))
-        //   var chosenItem;
-        //   for (var i = 0; i < results.length; i++) {
-        //     if (results[i].product_name === answer.choice) {
-        //       chosenItem = results[i];
-        //     }
-        //   }
+          //console.log(answer.choice)
+        //console.log( answer.order)
+         var choice= answer.choice;
+         var order= answer.order;
+        //console.log(choice)
+        //console.log(order)
+         connection.query('SELECT stock_quantity FROM products WHERE product_name=?', [choice], function(err, res){
+//console.log(JSON.stringify(res[0].stock_quantity))
+var quantity = JSON.stringify(res[0].stock_quantity)
+//console.log(quantity)
+var updated = quantity - order;
+
+// var orderTotal= quantity * price
+console.log(updated)
+         //connection.query('UPDATE products SET stock_quantity=?', [updated],  'WHERE product_name=?', [choice],function(err, res)
+if(order <= quantity){
+  connection.query('SELECT price FROM products WHERE product_name=?', [choice], function(err, results2){
+    console.log(JSON.stringify(results2[0].price))
+    var price = JSON.stringify(results2[0].price)
+     var orderTotal= order * price
+     console.log("Your total for this order is: " + orderTotal);
+    })
+
+}else{
+  console.log("Insufficient quantity! Please try another order")
+  buyItem();
+}
+          // console.log(res)
+
+         });
+    //  buyItem();
+        
         });
     });
   }
-  
-        //   // determine if bid was high enough
-        //   if (chosenItem.highest_bid < parseInt(answer.bid)) {
-        //     // bid was high enough, so update db, let the user know, and start over
-        //     connection.query(
-        //       "UPDATE auctions SET ? WHERE ?",
-        //       [
-        //         {
-        //           highest_bid: answer.bid
-        //         },
-        //         {
-        //           id: chosenItem.id
-        //         }
-        //       ],
-        //       function(error) {
-        //         if (error) throw err;
-        //         console.log("Bid placed successfully!");
-        //         start();
-        //       }
-        //     );
-        //   }
-        //   else {
-        //     // bid wasn't high enough, so apologize and start over
-        //     console.log("Your bid was too low. Try again...");
-        //     start();
-        //   }
 
-//were part of the entire bid function
-        //         });
-//     });
-//   }
+
